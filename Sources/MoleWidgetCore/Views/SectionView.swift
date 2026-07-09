@@ -55,32 +55,28 @@ struct DottedLine: View {
     }
 }
 
-/// Row with "label — bar — value" layout.
-struct MetricRow: View, Equatable {
+/// Row with "label — bar(value inside)" layout.
+public struct MetricRow: View, Equatable {
     let label: String
     let fraction: Double
     let value: String
     var barColor: Color?
 
-    init(label: String, fraction: Double, value: String, barColor: Color? = nil) {
+    public init(label: String, fraction: Double, value: String, barColor: Color? = nil) {
         self.label = label
         self.fraction = fraction
         self.value = value
         self.barColor = barColor
     }
 
-    var body: some View {
+    public var body: some View {
         // lineLimit(1) everywhere: a wrapped row changes the widget height
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Text(label)
                 .foregroundStyle(Theme.text)
                 .lineLimit(1)
                 .frame(width: 56, alignment: .leading)
-            BarView(fraction: fraction, color: barColor).equatable()
-            Text(value)
-                .foregroundStyle(Theme.text)
-                .lineLimit(1)
-                .frame(width: 56, alignment: .trailing)
+            BarView(fraction: fraction, color: barColor, label: value).equatable()
         }
     }
 }
@@ -91,7 +87,7 @@ struct TextRow: View {
     let value: String
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Text(label)
                 .foregroundStyle(Theme.text)
                 .lineLimit(1)
@@ -113,7 +109,7 @@ struct SparkRow: View, Equatable {
     let color: Color
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 6) {
             Text(label)
                 .foregroundStyle(Theme.text)
                 .lineLimit(1)
