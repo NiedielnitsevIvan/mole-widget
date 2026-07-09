@@ -172,22 +172,19 @@ public struct WidgetRootView: View {
     // MARK: - Title bar
 
     /// Always-visible first row: app glyph + name on the left,
-    /// size and lock controls on the right, Ko-fi badge centered behind them.
+    /// size and lock controls on the right.
     /// Permanent home of the lock — visible even when all sections are hidden.
     private var titleBar: some View {
-        ZStack {
-            KofiButton()
-            HStack(spacing: 6) {
-                TitleGlyphView()
-                Text("Mole Widget")
-                    .fontWeight(.bold)
-                    .foregroundStyle(Theme.header)
-                Spacer()
-                HStack(spacing: 2) {
-                    sizeButtons
-                    lockButton
-                    hideButton
-                }
+        HStack(spacing: 6) {
+            TitleGlyphView()
+            Text("Mole Widget")
+                .fontWeight(.bold)
+                .foregroundStyle(Theme.header)
+            Spacer()
+            HStack(spacing: 2) {
+                sizeButtons
+                lockButton
+                hideButton
             }
         }
     }
@@ -300,48 +297,6 @@ public struct WidgetRootView: View {
         }
         .buttonStyle(.plain)
         .help("Hide widget — bring it back from the menu bar icon")
-    }
-}
-
-// MARK: - Ko-fi
-
-/// Small "Ko-fi | Support" capsule that opens the donation page.
-/// Centered behind the title row, mirroring the sibling vuvuzela widget.
-private struct KofiButton: View {
-    @State private var hovering = false
-
-    private let kofiRed = Color(red: 1.0, green: 0.369, blue: 0.357)   // #FF5E5B
-    private let kofiBg  = Color(red: 0.10, green: 0.10, blue: 0.10)    // near-black
-
-    var body: some View {
-        Button {
-            NSWorkspace.shared.open(URL(string: "https://ko-fi.com/tadel_unso")!)
-        } label: {
-            HStack(spacing: 0) {
-                HStack(spacing: 4) {
-                    Image(systemName: "cup.and.saucer.fill")
-                        .font(.system(size: 9, weight: .medium))
-                    Text("Ko-fi")
-                        .font(.system(size: 10, weight: .semibold))
-                }
-                .foregroundStyle(.white)
-                .padding(.horizontal, 7)
-                .padding(.vertical, 3)
-                .background(kofiBg)
-
-                Text("Support")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(kofiRed)
-            }
-            .clipShape(Capsule())
-            .opacity(hovering ? 0.80 : 1.0)
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering = $0 }
-        .help("Support on Ko-fi ☕")
     }
 }
 
