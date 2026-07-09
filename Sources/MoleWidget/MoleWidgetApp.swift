@@ -3,6 +3,7 @@ import MoleWidgetCore
 import ServiceManagement
 import Sparkle
 import SwiftUI
+import WidgetKit
 
 @main
 struct MoleWidgetApp: App {
@@ -336,6 +337,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         forKey: WidgetSettings.refreshIntervalKey
     ) as? Double ?? WidgetSettings.defaultRefreshInterval
 
+    /// Keeps the Notification Center widget ~1 min fresh while the app runs;
+    /// WidgetKit's own refresh budget applies when we are not running.
+    private var widgetReloadTimer: Timer?
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory) // no Dock icon
 
@@ -403,6 +408,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.restartStoreIfIntervalChanged()
                 self?.reconcileVisibility()
             }
+        }
+
+        widgetReloadTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
