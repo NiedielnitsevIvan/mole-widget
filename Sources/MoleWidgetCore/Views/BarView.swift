@@ -6,11 +6,13 @@ public struct BarView: View, Equatable {
     let fraction: Double
     var color: Color?
     var label: String?
+    var height: CGFloat
 
-    public init(fraction: Double, color: Color? = nil, label: String? = nil) {
+    public init(fraction: Double, color: Color? = nil, label: String? = nil, height: CGFloat = 16) {
         self.fraction = fraction
         self.color = color
         self.label = label
+        self.height = height
     }
 
     public var body: some View {
@@ -27,7 +29,7 @@ public struct BarView: View, Equatable {
                 }
                 if let label {
                     Text(label)
-                        .font(.system(size: 10, weight: .semibold))
+                        .font(.system(size: height >= 14 ? 10 : 8, weight: .semibold))
                         .monospacedDigit()
                         .foregroundStyle(Color.primary)
                         .lineLimit(1)
@@ -35,7 +37,7 @@ public struct BarView: View, Equatable {
                 }
             }
         }
-        .frame(height: 16)
-        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: height * 5 / 16))
     }
 }
