@@ -8,7 +8,11 @@ FRAMEWORKS = /Library/Developer/CommandLineTools/Library/Developer/Frameworks
 # @State fails with "plugin for module 'SwiftUIMacros' not found". Pin the
 # stable 26.5 SDK; fall back to the default SDK once the pinned one is gone.
 export SDKROOT ?= $(shell xcrun --sdk macosx26.5 --show-sdk-path 2>/dev/null || xcrun --show-sdk-path)
-TESTFLAGS = -Xswiftc -F -Xswiftc $(FRAMEWORKS)
+# Swift Testing macros (#expect, @Test) live in a plugin the explicit-modules
+# build does not find on its own; both flags are harmless with full Xcode.
+TESTING_PLUGINS = /Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/testing
+TESTFLAGS = -Xswiftc -F -Xswiftc $(FRAMEWORKS) \
+            -Xswiftc -plugin-path -Xswiftc $(TESTING_PLUGINS)
 
 APP_NAME = Mole Widget
 DIST = dist/$(APP_NAME).app
