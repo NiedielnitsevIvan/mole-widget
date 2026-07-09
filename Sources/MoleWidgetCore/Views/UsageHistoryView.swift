@@ -81,7 +81,7 @@ public struct UsageHistoryView: View {
                     y: .value("Usage", sample.memFraction * 100),
                     series: .value("Metric", "Memory")
                 )
-                .foregroundStyle(Theme.header)
+                .foregroundStyle(Theme.accentSecondary)
             }
             if let selectedDate {
                 RuleMark(x: .value("Selected", selectedDate))
@@ -90,7 +90,7 @@ public struct UsageHistoryView: View {
         }
         .chartYScale(domain: 0...100)
         .chartYAxisLabel("%")
-        .chartForegroundStyleScale(["CPU": Theme.accent, "Memory": Theme.header])
+        .chartForegroundStyleScale(["CPU": Theme.accent, "Memory": Theme.accentSecondary])
         .chartXSelection(value: $selectedDate)
         .frame(minHeight: 200)
     }
@@ -112,7 +112,7 @@ public struct UsageHistoryView: View {
                     Text("CPU \(Int((sample.cpuFraction * 100).rounded()))%")
                         .foregroundStyle(Theme.accent)
                     Text("RAM \(Fmt.gigabytes(sample.memUsedBytes))")
-                        .foregroundStyle(Theme.header)
+                        .foregroundStyle(Theme.accentSecondary)
                 }
 
                 if sample.topProcesses.isEmpty {

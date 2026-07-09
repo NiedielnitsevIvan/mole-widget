@@ -126,7 +126,7 @@ public struct NetworkSectionView: View, Equatable {
             } else {
                 if let r = rates {
                     SparkRow(label: "Down", values: downloadHistory, value: Fmt.rate(r.download), color: Theme.accent)
-                    SparkRow(label: "Up", values: uploadHistory, value: Fmt.rate(r.upload), color: Theme.header)
+                    SparkRow(label: "Up", values: uploadHistory, value: Fmt.rate(r.upload), color: Theme.accentSecondary)
                 }
                 if let i = info {
                     TextRow(label: "Iface", value: ifaceString(i))
