@@ -3,9 +3,6 @@ import SwiftUI
 /// System-semantic palette — the widget follows the macOS appearance
 /// (Liquid Glass chrome, light/dark adaptive) instead of a fixed theme.
 public enum Theme {
-    /// Legacy fixed-dark panel color; deleted with its last caller.
-    public static let background = Color(red: 0.118, green: 0.133, blue: 0.188)
-
     public static let header = Color.primary
     public static let accent = Color.green
     public static let warning = Color.yellow

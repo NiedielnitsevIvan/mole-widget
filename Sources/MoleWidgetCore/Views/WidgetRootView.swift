@@ -343,46 +343,38 @@ private struct KofiButton: View {
 
 // MARK: - Background
 
-/// NSVisualEffectView wrapper — gives the same frosted-glass material native desktop
-/// widgets use (.hudWindow + behindWindow blending). Stays active regardless of
-/// window focus since the widget never becomes key.
-private struct FrostView: NSViewRepresentable {
-    func makeNSView(context: Context) -> NSVisualEffectView {
-        let v = NSVisualEffectView()
-        v.material = .sidebar
-        v.blendingMode = .behindWindow
-        v.state = .active
-        v.appearance = NSAppearance(named: .darkAqua)
-        return v
-    }
-    func updateNSView(_ nsView: NSVisualEffectView, context: Context) {}
-}
-
-/// On macOS 26+ uses NSVisualEffectView (.hudWindow) to match native Tahoe widget
-/// appearance; falls back to the opaque dark panel on earlier systems.
+/// Liquid Glass panel. The user's backgroundOpacity setting acts as glass
+/// tint strength (macOS 27-style clear→tinted transparency): the tint color
+/// is the system window background, so it adapts to light/dark.
+/// Pre-macOS 26 fallback: the same tint over a regular material.
 private struct WidgetBackground: ViewModifier {
     let opacity: Double
+
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+    }
+
+    private var tint: Color {
+        Color(nsColor: .windowBackgroundColor)
+            .opacity(WidgetSettings.clampOpacity(opacity))
+    }
 
     func body(content: Content) -> some View {
         #if swift(>=6.3)
         if #available(macOS 26, *) {
-            content
-                .background(Color.black.opacity(0.30), in: RoundedRectangle(cornerRadius: 12))
-                .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 12))
+            content.glassEffect(.regular.tint(tint), in: shape)
         } else {
-            content
-                .background(
-                    Theme.background.opacity(WidgetSettings.clampOpacity(opacity)),
-                    in: RoundedRectangle(cornerRadius: 12)
-                )
+            fallback(content)
         }
         #else
-        content
-            .background(
-                Theme.background.opacity(WidgetSettings.clampOpacity(opacity)),
-                in: RoundedRectangle(cornerRadius: 12)
-            )
+        fallback(content)
         #endif
+    }
+
+    private func fallback(_ content: Content) -> some View {
+        content
+            .background(tint, in: shape)
+            .background(.regularMaterial, in: shape)
     }
 }
 
