@@ -17,7 +17,7 @@ TESTFLAGS = -Xswiftc -F -Xswiftc $(FRAMEWORKS) \
 APP_NAME = Mole Widget
 DIST = dist/$(APP_NAME).app
 
-.PHONY: run test app clean
+.PHONY: run test app install clean
 
 run:
 	swift run MoleWidget
@@ -38,9 +38,20 @@ app:
 	mkdir -p "$(DIST)/Contents/Frameworks"
 	cp -R .build/release/Sparkle.framework "$(DIST)/Contents/Frameworks/Sparkle.framework"
 	install_name_tool -add_rpath "@executable_path/../Frameworks" "$(DIST)/Contents/MacOS/MoleWidget"
+	mkdir -p "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/MacOS"
+	cp .build/release/MoleWidgetExtension "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/MacOS/MoleWidgetExtension"
+	cp Resources/WidgetExtension-Info.plist "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/Info.plist"
+	codesign --force --sign - "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex"
 	codesign --force --sign - "$(DIST)/Contents/Frameworks/Sparkle.framework"
 	codesign --force --sign - "$(DIST)"
 	@echo "Done: $(DIST)"
+
+# Widget gallery registration is most reliable from /Applications.
+install: app
+	pkill -x MoleWidget || true
+	rm -rf "/Applications/$(APP_NAME).app"
+	ditto "$(DIST)" "/Applications/$(APP_NAME).app"
+	open "/Applications/$(APP_NAME).app"
 
 clean:
 	rm -rf .build dist
