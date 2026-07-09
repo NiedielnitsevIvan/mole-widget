@@ -31,7 +31,13 @@ let package = Package(
             name: "MoleWidgetExtension",
             dependencies: ["MoleWidgetCore"],
             path: "Sources/MoleWidgetExtension",
-            swiftSettings: [.swiftLanguageMode(.v5)]
+            swiftSettings: [.swiftLanguageMode(.v5)],
+            linkerSettings: [
+                // App extensions enter through Foundation's NSExtensionMain,
+                // not the Swift-generated main — chronod's ExtensionKit
+                // bootstrap traps otherwise (verified against system appexes).
+                .unsafeFlags(["-Xlinker", "-e", "-Xlinker", "_NSExtensionMain"])
+            ]
         ),
         .testTarget(
             name: "MoleWidgetCoreTests",
