@@ -41,7 +41,7 @@ app:
 	mkdir -p "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/MacOS"
 	cp .build/release/MoleWidgetExtension "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/MacOS/MoleWidgetExtension"
 	cp Resources/WidgetExtension-Info.plist "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/Info.plist"
-	codesign --force --sign - "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex"
+	codesign --force --sign - --entitlements Resources/WidgetExtension.entitlements "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex"
 	codesign --force --sign - "$(DIST)/Contents/Frameworks/Sparkle.framework"
 	codesign --force --sign - "$(DIST)"
 	@echo "Done: $(DIST)"
