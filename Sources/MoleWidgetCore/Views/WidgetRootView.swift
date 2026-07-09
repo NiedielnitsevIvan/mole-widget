@@ -254,7 +254,9 @@ public struct WidgetRootView: View {
                 Button { applyPreset(preset) } label: {
                     Text(preset.label)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(activePreset == preset ? Theme.header : Theme.dim)
+                        .foregroundStyle(activePreset == preset
+                            ? AnyShapeStyle(Color.primary)
+                            : AnyShapeStyle(.tertiary))
                         .frame(width: 16, height: 20)
                         .contentShape(Rectangle())
                 }
@@ -272,7 +274,9 @@ public struct WidgetRootView: View {
         } label: {
             Image(systemName: positionLocked ? "lock.fill" : "lock.open")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(positionLocked ? Theme.warning : Theme.dim)
+                .foregroundStyle(positionLocked
+                    ? AnyShapeStyle(Color.orange)
+                    : AnyShapeStyle(.tertiary))
                 .frame(width: 20, height: 20) // hit area slightly larger than the icon
                 .contentShape(Rectangle())
         }
@@ -290,7 +294,7 @@ public struct WidgetRootView: View {
         } label: {
             Image(systemName: "eye.slash")
                 .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(Theme.dim)
+                .foregroundStyle(.tertiary)
                 .frame(width: 20, height: 20) // hit area slightly larger than the icon
                 .contentShape(Rectangle())
         }
