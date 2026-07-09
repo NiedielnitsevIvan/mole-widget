@@ -2,6 +2,12 @@
 # framework; the SwiftPM test runner needs a global -F flag, otherwise
 # canImport(Testing) == false and tests silently do not run.
 FRAMEWORKS = /Library/Developer/CommandLineTools/Library/Developer/Frameworks
+
+# The macOS 27 beta SDK declares SwiftUI @State & co. as macros implemented in
+# SwiftUIMacros, but Command Line Tools ships no libSwiftUIMacros.dylib, so any
+# @State fails with "plugin for module 'SwiftUIMacros' not found". Pin the
+# stable 26.5 SDK; fall back to the default SDK once the pinned one is gone.
+export SDKROOT ?= $(shell xcrun --sdk macosx26.5 --show-sdk-path 2>/dev/null || xcrun --show-sdk-path)
 TESTFLAGS = -Xswiftc -F -Xswiftc $(FRAMEWORKS)
 
 APP_NAME = Mole Widget
