@@ -3,6 +3,12 @@ import Testing
 @testable import MoleWidgetCore
 
 @Suite struct WidgetSettingsTests {
+    @Test func widthBounds_standardMediumProportions() {
+        #expect(WidgetSettings.minWidth == 330)
+        #expect(WidgetSettings.defaultWidth == 340)
+        #expect(WidgetSettings.maxWidth == 880)
+    }
+
     @Test func clampWidth() {
         #expect(WidgetSettings.clampWidth(100) == WidgetSettings.minWidth)
         #expect(WidgetSettings.clampWidth(10_000) == WidgetSettings.maxWidth)

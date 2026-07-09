@@ -70,9 +70,16 @@ public struct WidgetRootView: View {
 
     @State private var dragStartWidth: Double?
 
-    /// Two columns + inter-column spacing (24) + horizontal padding (2×16).
+    /// One column below 460 pt (standard-medium proportions), two above.
+    private var columnCount: Int {
+        WidgetSettings.clampWidth(widgetWidth) < 460 ? 1 : 2
+    }
+
+    /// Columns + inter-column spacing (24 each gap) + horizontal padding (2×16).
     private var columnWidth: CGFloat {
-        (WidgetSettings.clampWidth(widgetWidth) - 24 - 32) / 2
+        let clamped = WidgetSettings.clampWidth(widgetWidth)
+        let gaps = CGFloat(columnCount - 1) * 24
+        return (clamped - gaps - 32) / CGFloat(columnCount)
     }
 
     /// Ordered list of enabled section slots.
@@ -134,21 +141,18 @@ public struct WidgetRootView: View {
 
                 if !enabledSections.isEmpty {
                     Grid(alignment: .topLeading, horizontalSpacing: 24, verticalSpacing: 16) {
-                        // Chunk the enabled sections into pairs; the odd tail sits alone.
-                        // Row identity = leading section, so rows keep stable identity
-                        // when other sections are toggled on/off.
-                        let pairs = enabledSections.chunks(of: 2)
-                        ForEach(pairs, id: \.[0].id) { pair in
+                        // Chunk enabled sections into rows of `columnCount`;
+                        // row identity = leading section, so rows keep stable
+                        // identity when other sections are toggled on/off.
+                        let rows = enabledSections.chunks(of: columnCount)
+                        ForEach(rows, id: \.[0].id) { row in
                             GridRow {
-                                // Leading cell (always present)
-                                sectionView(for: pair[0])
-                                    .frame(width: columnWidth, alignment: .topLeading)
-                                // Trailing cell (present only in full pairs)
-                                if pair.count > 1 {
-                                    sectionView(for: pair[1])
+                                ForEach(row, id: \.id) { section in
+                                    sectionView(for: section)
                                         .frame(width: columnWidth, alignment: .topLeading)
-                                } else {
-                                    // Empty spacer to keep the grid geometry consistent
+                                }
+                                if row.count < columnCount {
+                                    // Empty spacer keeps the grid geometry consistent
                                     Color.clear
                                         .frame(width: columnWidth)
                                 }
