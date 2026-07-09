@@ -6,5 +6,11 @@
 	     the widget appex must carry the sandbox entitlement even ad-hoc signed. -->
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
+	<!-- Best-effort SMC temperature inside the sandbox; the Temp row is
+	     hidden if the connection is still denied. -->
+	<key>com.apple.security.temporary-exception.iokit-user-client-class</key>
+	<array>
+		<string>AppleSMCClient</string>
+	</array>
 </dict>
 </plist>
