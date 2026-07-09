@@ -7,6 +7,7 @@ let package = Package(
     products: [
         .library(name: "MoleWidgetCore", targets: ["MoleWidgetCore"]),
         .executable(name: "MoleWidget", targets: ["MoleWidget"]),
+        .executable(name: "MoleWidgetExtension", targets: ["MoleWidgetExtension"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.0.0"),
@@ -24,6 +25,12 @@ let package = Package(
                 .product(name: "Sparkle", package: "Sparkle"),
             ],
             path: "Sources/MoleWidget",
+            swiftSettings: [.swiftLanguageMode(.v5)]
+        ),
+        .executableTarget(
+            name: "MoleWidgetExtension",
+            dependencies: ["MoleWidgetCore"],
+            path: "Sources/MoleWidgetExtension",
             swiftSettings: [.swiftLanguageMode(.v5)]
         ),
         .testTarget(
