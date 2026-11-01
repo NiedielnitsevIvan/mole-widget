@@ -38,10 +38,23 @@ struct SystemStatusWidget: Widget {
             provider: SystemStatusProvider()
         ) { entry in
             SystemStatusView(snapshot: entry.snapshot)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(for: .widget) { WidgetGlassBackground() }
         }
         .configurationDisplayName("Mole System Status")
         .description("CPU, memory and disk at a glance.")
         .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+/// Liquid Glass widget background, matching the desktop panel
+/// (see WidgetBackground in WidgetRootView). Pre-macOS 26 fallback:
+/// a translucent material.
+private struct WidgetGlassBackground: View {
+    var body: some View {
+        if #available(macOS 26, *) {
+            Color.clear.glassEffect(.regular, in: .rect)
+        } else {
+            Rectangle().fill(.regularMaterial)
+        }
     }
 }
