@@ -7,7 +7,7 @@ Fork of [TadelUnso/mole-widget](https://github.com/TadelUnso/mole-widget) with a
 
 **Mole Widget** is a lightweight macOS desktop system monitor widget: live CPU, memory, disk, network, battery and process metrics right on your desktop. Native Swift + SwiftUI — a borderless window living at desktop level, above the wallpaper and below application windows.
 
-<img src="assets/widget.webp" width="520" alt="Mole Widget on the desktop">
+<img src="assets/widget.png" width="490" alt="Mole Widget on the desktop">
 
 ## What this fork adds
 
