@@ -2,7 +2,7 @@ import MoleWidgetCore
 import SwiftUI
 import WidgetKit
 
-/// Sidebar widget content. Small: health + CPU/MEM bars.
+/// Sidebar widget content. Small: health + CPU/MEM/disk bars.
 /// Medium: the desktop widget's full S preset (CPU + Memory columns).
 struct SystemStatusView: View {
     @Environment(\.widgetFamily) private var family
@@ -38,6 +38,12 @@ struct SystemStatusView: View {
                 value: WidgetSnapshot.percentText(snapshot.memFraction)
             )
             .font(.system(size: 11).weight(.medium).monospacedDigit())
+            MetricRow(
+                label: "Disk",
+                fraction: snapshot.diskFraction ?? 0,
+                value: WidgetSnapshot.percentText(snapshot.diskFraction)
+            )
+            .font(.system(size: 11).weight(.medium).monospacedDigit())
             Spacer(minLength: 0)
         }
     }
@@ -71,7 +77,7 @@ struct SystemStatusView: View {
             Circle().fill(healthColor).frame(width: 7, height: 7)
             Text("\(snapshot.healthScore)")
             Spacer()
-            Text("up \(snapshot.uptimeText) · \(snapshot.asOfText)")
+            Text("\(snapshot.uptimeText) · \(snapshot.asOfText)")
                 .font(.system(size: 9))
                 .foregroundStyle(Theme.dim)
         }

@@ -50,7 +50,7 @@ public struct WidgetSnapshot {
         fraction.map(Fmt.percent) ?? "—"
     }
 
-    /// Formatted uptime ("5h 36m") or "—".
+    /// Formatted uptime ("up 5h 36m") or "—".
     public var uptimeText: String {
         uptime.map(SystemInfoSnapshot.formatUptime) ?? "—"
     }
