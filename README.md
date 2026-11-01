@@ -15,8 +15,18 @@ Fork of [TadelUnso/mole-widget](https://github.com/TadelUnso/mole-widget) with a
 - **Liquid Glass** — on macOS 26+ the panel is a Liquid Glass surface, with the background-opacity setting acting as the glass tint
 - **Narrow layout** — the window resizes down to 330 pt (upstream: 490) and folds to a single column below 460 pt
 - **Inline bar labels** — values are drawn inside the capacity bars for tighter rows
-- **Widget-gallery widget** — a "Mole System Status" WidgetKit widget (small and medium) for the macOS widget gallery: CPU, memory and disk at a glance; the medium size carries the full desktop S preset — cores, load average, temperature, memory detail and a usage-history sparkline. The running app nudges its timelines every minute; standalone it refreshes about every 5 minutes
+- **Widget-gallery widget** — a "Mole System Status" WidgetKit widget for the macOS widget gallery, [see below](#macos-widget)
 - `make install` — build and install straight into /Applications
+
+## macOS widget
+
+Besides the desktop panel, the app ships a **Mole System Status** WidgetKit widget for the standard macOS widget gallery — add it to the desktop or Notification Center via right-click on the desktop → **Edit Widgets** → **Mole Widget**.
+
+<img src="assets/widget-small.png" width="188" alt="Small widget"> <img src="assets/widget-medium.png" width="358" alt="Medium widget">
+
+- **Small** — health score plus CPU, memory and disk bars
+- **Medium** — the desktop widget's full S preset: CPU total, temperature, three busiest cores, load average and a usage-trend sparkline next to memory detail
+- While the app is running it nudges the widget timelines every minute; standalone, WidgetKit's refresh budget gives roughly 5-minute updates
 
 ## Features
 
