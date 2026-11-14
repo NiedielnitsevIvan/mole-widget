@@ -8,6 +8,7 @@ public struct SectionView<Content: View>: View {
     let icon: String
     let title: String
     @ViewBuilder let content: Content
+    @Environment(\.sectionIconScale) private var iconScale
 
     public init(icon: String, title: String, @ViewBuilder content: () -> Content) {
         self.icon = icon
@@ -19,7 +20,7 @@ public struct SectionView<Content: View>: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
                 HStack(spacing: 6) {
-                    Text(icon).foregroundStyle(Theme.header)
+                    Text(icon).foregroundStyle(Theme.header).scaleEffect(iconScale)
                     Text(title).bold().foregroundStyle(Theme.header)
                 }
                 .contentShape(Rectangle())
@@ -38,6 +39,19 @@ public struct SectionView<Content: View>: View {
                 NSLog("mole-widget: failed to open Activity Monitor: \(error.localizedDescription)")
             }
         }
+    }
+}
+
+private struct SectionIconScaleKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 1
+}
+
+public extension EnvironmentValues {
+    /// Draws section title icons bigger without changing the row height
+    /// (the large widget has no vertical room to spare).
+    var sectionIconScale: CGFloat {
+        get { self[SectionIconScaleKey.self] }
+        set { self[SectionIconScaleKey.self] = newValue }
     }
 }
 

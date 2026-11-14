@@ -32,6 +32,7 @@ struct SystemStatusView: View {
         }
         // Row labels, text rows, section titles and process rows.
         .font(.dot(sizes.label))
+        .environment(\.sectionIconScale, sizes.iconScale)
     }
 
     // MARK: - Small
@@ -148,6 +149,7 @@ private struct Sizes {
     var subheader: CGFloat  // "up 1d 7h · as of 16:47"
     var spacing: CGFloat    // between the widget's blocks
     var trend: CGFloat      // sparkline height
+    var iconScale: CGFloat = 1  // section title icons (◉ ▥ ≡)
 
     // The small widget has no subheader or trend row.
     static let small = Sizes(label: 13, labelWidth: 50, gap: 6, bar: 22, value: 12,
@@ -155,7 +157,7 @@ private struct Sizes {
     static let medium = Sizes(label: 10, labelWidth: 40, gap: 4, bar: 12, value: 9,
                               header: 13, subheader: 10, spacing: 5, trend: 12)
     static let large = Sizes(label: 12, labelWidth: 48, gap: 6, bar: 18, value: 11,
-                             header: 16, subheader: 11, spacing: 8, trend: 14)
+                             header: 16, subheader: 11, spacing: 8, trend: 14, iconScale: 1.4)
 }
 
 private extension Font {
