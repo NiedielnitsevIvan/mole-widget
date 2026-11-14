@@ -20,7 +20,7 @@ struct SystemStatusProvider: TimelineProvider {
         DispatchQueue.global(qos: .userInitiated).async {
             let snapshot = WidgetSampler.full()
             let entry = SystemStatusEntry(date: snapshot.date, snapshot: snapshot)
-            // The running Mole app nudges reloads every minute; on our own
+            // The running Mole app nudges reloads every 5 s; on our own
             // we ask for a refresh in 5 min and take what the budget gives.
             let timeline = Timeline(
                 entries: [entry],

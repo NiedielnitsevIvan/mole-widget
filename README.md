@@ -26,7 +26,7 @@ Besides the desktop panel, the app ships a **Mole System Status** WidgetKit widg
 
 - **Small** — health score plus CPU, memory and disk bars
 - **Medium** — the desktop widget's full S preset: CPU total, temperature, three busiest cores, load average and a usage-trend sparkline next to memory detail
-- While the app is running it nudges the widget timelines every minute; standalone, WidgetKit's refresh budget gives roughly 5-minute updates
+- While the app is running, the widget refreshes every 5 s (the fastest macOS allows). Without the app, WidgetKit's budget only refreshes it occasionally — mostly on system wakes — so keep the app running for live values
 
 ## Features
 

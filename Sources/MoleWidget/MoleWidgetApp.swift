@@ -410,7 +410,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        widgetReloadTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { _ in
+        // chronod exempts reloads from the WidgetKit budget while this app is
+        // visible, throttled to one per 5 s. Without these nudges the widget only
+        // refreshes on system wakes, sampling the post-wake CPU spike.
+        widgetReloadTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
             WidgetCenter.shared.reloadAllTimelines()
         }
     }
