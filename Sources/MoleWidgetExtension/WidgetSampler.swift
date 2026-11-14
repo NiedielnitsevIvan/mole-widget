@@ -66,11 +66,12 @@ enum WidgetSampler {
             uptime: info?.uptime,
             temperature: temperature,
             topCores: topCores,
-            loadAverage: CPUCollector().loadAverage(),
             cpuHistory: history,
             memFreeFraction: mem?.freeFraction,
             memCached: mem?.cached,
-            memAvailable: mem?.available
+            memAvailable: mem?.available,
+            // The sandbox denies listing processes; the running app shares its list.
+            topProcesses: SharedProcesses().read()
         )
     }
 }

@@ -14,10 +14,14 @@ public struct UsageHistoryPersistence {
         self.fileURL = dir.appendingPathComponent("usage-history.jsonl")
     }
 
-    public static var defaultDirectory: URL {
-        let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return base.appendingPathComponent("Mole Widget", isDirectory: true)
-    }
+    /// The app's data folder under the real home, so the sandboxed widget finds
+    /// it too (there `FileManager` would point at the widget's container).
+    /// Computed once: `getpwuid` returns a shared buffer and isn't thread-safe.
+    public static let defaultDirectory: URL = {
+        let home = getpwuid(getuid()).map { String(cString: $0.pointee.pw_dir) } ?? NSHomeDirectory()
+        return URL(fileURLWithPath: home)
+            .appendingPathComponent("Library/Application Support/Mole Widget", isDirectory: true)
+    }()
 
     private static let encoder: JSONEncoder = {
         let encoder = JSONEncoder()

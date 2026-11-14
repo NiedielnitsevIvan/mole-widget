@@ -15,7 +15,7 @@ public struct ProcSample: Equatable {
 
 /// Ready-to-display process row.
 /// cpuFraction: 1.0 == one full core (like top).
-public struct ProcessUsage: Equatable {
+public struct ProcessUsage: Equatable, Codable {
     public let pid: Int32 // stable identity for SwiftUI lists (names can repeat)
     public let name: String
     public let cpuFraction: Double

@@ -39,29 +39,18 @@ struct WidgetSnapshotTests {
     }
 
     private func makeSnap(
-        loadAverage: [Double] = [],
         memUsed: UInt64? = nil,
         memTotal: UInt64? = nil
     ) -> WidgetSnapshot {
         WidgetSnapshot(
             date: .now, healthScore: 100, cpuFraction: nil, memFraction: nil,
-            memUsed: memUsed, memTotal: memTotal, diskFraction: nil, uptime: nil,
-            loadAverage: loadAverage
+            memUsed: memUsed, memTotal: memTotal, diskFraction: nil, uptime: nil
         )
-    }
-
-    @Test func loadText_threeValues_formatted() {
-        #expect(makeSnap(loadAverage: [3.85, 3.51, 3.63]).loadText == "3.85 / 3.51 / 3.63")
-    }
-
-    @Test func loadText_tooFewValues_isDash() {
-        #expect(makeSnap(loadAverage: [1.0]).loadText == "—")
-        #expect(makeSnap().loadText == "—")
     }
 
     @Test func memTotalText_values_formatted() {
         let snap = makeSnap(memUsed: 11_900_000_000, memTotal: 16_000_000_000)
-        #expect(snap.memTotalText == "\(Fmt.gigabytes(11_900_000_000)) / \(Fmt.gigabytes(16_000_000_000))")
+        #expect(snap.memTotalText == "11.1/\(Fmt.gigabytes(16_000_000_000))")
     }
 
     @Test func memTotalText_nil_isDash() {

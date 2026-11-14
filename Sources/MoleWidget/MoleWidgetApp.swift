@@ -413,7 +413,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // chronod exempts reloads from the WidgetKit budget while this app is
         // visible, throttled to one per 5 s. Without these nudges the widget only
         // refreshes on system wakes, sampling the post-wake CPU spike.
-        widgetReloadTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+        widgetReloadTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                // The widget's sandbox can't list processes; it shows ours.
+                // Empty until the store has two samples: don't publish that.
+                if let self, !self.store.topProcesses.isEmpty {
+                    SharedProcesses().write(self.store.topProcesses)
+                }
+            }
             WidgetCenter.shared.reloadAllTimelines()
         }
     }

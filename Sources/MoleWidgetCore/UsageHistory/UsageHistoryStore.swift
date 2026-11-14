@@ -78,7 +78,8 @@ public final class UsageHistoryStore {
             cpuFraction: cpu.totalUsage,
             memUsedBytes: memory.used,
             memTotalBytes: memory.total,
-            topProcesses: metrics.topProcesses.map {
+            // The store keeps 5 for the large widget; history keeps the panel's 3.
+            topProcesses: metrics.topProcesses.prefix(3).map {
                 UsageProcess(pid: $0.pid, name: $0.name, cpuFraction: $0.cpuFraction, memoryBytes: $0.memoryBytes)
             }
         )

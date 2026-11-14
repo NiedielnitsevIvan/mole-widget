@@ -199,9 +199,11 @@ public struct PowerSectionView: View, Equatable {
 
 public struct ProcessesSectionView: View, Equatable {
     let processes: [ProcessUsage]
+    let limit: Int
 
-    public init(processes: [ProcessUsage]) {
+    public init(processes: [ProcessUsage], limit: Int = 3) {
         self.processes = processes
+        self.limit = limit
     }
 
     private let cpuColumnWidth: CGFloat = 44
@@ -222,7 +224,7 @@ public struct ProcessesSectionView: View, Equatable {
                 }
                 .foregroundStyle(Theme.dim)
 
-                ForEach(processes.prefix(3), id: \.pid) { p in
+                ForEach(processes.prefix(limit), id: \.pid) { p in
                     // Process names vary wildly in length; give the name the
                     // flexible space and let SwiftUI truncate with "…" —
                     // a single line always, so the row height never jumps.

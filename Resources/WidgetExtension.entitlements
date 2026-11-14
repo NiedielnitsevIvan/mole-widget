@@ -12,5 +12,11 @@
 	<array>
 		<string>AppleSMCClient</string>
 	</array>
+	<!-- Top processes written by the app (SharedProcesses): the sandbox
+	     denies listing other processes. -->
+	<key>com.apple.security.temporary-exception.files.home-relative-path.read-only</key>
+	<array>
+		<string>/Library/Application Support/Mole Widget/</string>
+	</array>
 </dict>
 </plist>

@@ -37,12 +37,13 @@ struct SystemStatusWidget: Widget {
             kind: "MoleSystemStatus",
             provider: SystemStatusProvider()
         ) { entry in
+            // No containerBackground, like Apple's Batteries widget: any custom
+            // background, even a clear one, replaces the system's frosted glass.
             SystemStatusView(snapshot: entry.snapshot)
-                .containerBackground(for: .widget) { Color.clear }
         }
         .configurationDisplayName("Mole System Status")
         .description("CPU, memory and disk at a glance.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
         // The system glass platter of Apple's own widgets. Public API only gets
         // an opaque platter: glassEffect in containerBackground renders white.
         // ponytail: private WidgetKit API, may change in a future macOS.

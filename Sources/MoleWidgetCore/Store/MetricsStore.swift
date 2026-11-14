@@ -153,7 +153,8 @@ public final class MetricsStore {
                 topProcesses = ProcessMath.top(
                     previous: prev.samples,
                     current: procSamples,
-                    interval: now.timeIntervalSince(prev.at)
+                    interval: now.timeIntervalSince(prev.at),
+                    count: 5 // the large widget shows 5; the panel and history 3
                 )
             }
             previousProcs = (procSamples, now)

@@ -3,7 +3,8 @@ import SwiftUI
 import WidgetKit
 
 /// Sidebar widget content. Small: health + CPU/MEM/disk bars.
-/// Medium: the desktop widget's full S preset (CPU + Memory columns).
+/// Medium: CPU + Memory columns. Large: the same columns, bigger, plus a
+/// full-width Processes section.
 struct SystemStatusView: View {
     @Environment(\.widgetFamily) private var family
     let snapshot: WidgetSnapshot
@@ -14,144 +15,147 @@ struct SystemStatusView: View {
         return Theme.danger
     }
 
-    var body: some View {
+    private var sizes: Sizes {
         switch family {
-        case .systemMedium: medium
-        default: small
+        case .systemMedium: .medium
+        case .systemLarge: .large
+        default: .small
         }
+    }
+
+    var body: some View {
+        Group {
+            switch family {
+            case .systemMedium, .systemLarge: detailed
+            default: small
+            }
+        }
+        // Row labels, text rows, section titles and process rows.
+        .font(.dot(sizes.label))
     }
 
     // MARK: - Small
 
     private var small: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            healthLine
-            CompactRow(label: "CPU", fraction: snapshot.cpuFraction, large: true)
-            CompactRow(label: "Memory", fraction: snapshot.memFraction, large: true)
-            CompactRow(label: "Disk", fraction: snapshot.diskFraction, large: true)
+        VStack(alignment: .leading, spacing: sizes.spacing) {
+            healthScore
+            barRow("CPU", snapshot.cpuFraction)
+            barRow("Memory", snapshot.memFraction)
+            barRow("Disk", snapshot.diskFraction)
             Spacer(minLength: 0)
         }
     }
 
-    // MARK: - Medium (full S preset)
+    // MARK: - Medium and large
 
-    private var medium: some View {
-        VStack(alignment: .leading, spacing: 5) {
-            header
+    private var detailed: some View {
+        VStack(alignment: .leading, spacing: sizes.spacing) {
+            HStack(spacing: 4) {
+                healthScore
+                Spacer()
+                Text("\(snapshot.uptimeText) · \(snapshot.asOfText)")
+                    .font(.dot(sizes.subheader))
+                    .foregroundStyle(Theme.dim)
+            }
             HStack(alignment: .top, spacing: 12) {
                 cpuColumn.frame(maxWidth: .infinity, alignment: .leading)
                 memoryColumn.frame(maxWidth: .infinity, alignment: .leading)
             }
+            if family == .systemLarge {
+                ProcessesSectionView(processes: snapshot.topProcesses, limit: 5)
+            }
             Spacer(minLength: 0)
         }
     }
 
-    private var healthLine: some View {
+    /// "Health ● 100".
+    private var healthScore: some View {
         HStack(spacing: 4) {
             Text("Health")
-            Circle().fill(healthColor).frame(width: 7, height: 7)
+            Circle().fill(healthColor).frame(width: sizes.header / 2, height: sizes.header / 2)
             Text("\(snapshot.healthScore)")
-            Spacer()
         }
-        .font(.dot(12))
-    }
-
-    private var header: some View {
-        HStack(spacing: 4) {
-            Text("Health")
-            Circle().fill(healthColor).frame(width: 7, height: 7)
-            Text("\(snapshot.healthScore)")
-            Spacer()
-            Text("\(snapshot.uptimeText) · \(snapshot.asOfText)")
-                .font(.dot(9))
-                .foregroundStyle(Theme.dim)
-        }
-        .font(.dot(12))
+        .font(.dot(sizes.header))
     }
 
     private var cpuColumn: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            columnTitle("CPU")
-            CompactRow(label: "Total", fraction: snapshot.cpuFraction)
+        SectionView(icon: "◉", title: "CPU") {
+            barRow("Total", snapshot.cpuFraction)
             if let temp = snapshot.temperature {
-                CompactRow(
-                    label: "Temp",
-                    fraction: min(temp / 100, 1.0),
-                    valueOverride: String(format: "%.0f°C", temp)
-                )
+                barRow("Temp", min(temp / 100, 1.0), value: String(format: "%.0f°C", temp))
             }
             ForEach(snapshot.topCores, id: \.index) { core in
-                CompactRow(label: "Core\(core.index + 1)", fraction: core.usage)
+                barRow("Core\(core.index + 1)", core.usage)
             }
-            textRow("Load", snapshot.loadText)
-            HStack(spacing: 4) {
-                compactLabel("Trend")
+            HStack(spacing: sizes.gap) {
+                rowLabel("Trend")
                 SparklineView(values: snapshot.cpuHistory, color: Theme.accent)
-                    .frame(height: 10)
+                    .frame(height: sizes.trend)
             }
         }
     }
 
     private var memoryColumn: some View {
-        VStack(alignment: .leading, spacing: 3) {
-            columnTitle("Memory")
-            CompactRow(label: "Used", fraction: snapshot.memFraction)
-            CompactRow(label: "Free", fraction: snapshot.memFreeFraction, barColor: Theme.accent)
+        SectionView(icon: "▥", title: "Memory") {
+            barRow("Used", snapshot.memFraction)
+            barRow("Free", snapshot.memFreeFraction, color: Theme.accent)
             textRow("Total", snapshot.memTotalText)
             textRow("Cached", WidgetSnapshot.gbText(snapshot.memCached))
             textRow("Avail", WidgetSnapshot.gbText(snapshot.memAvailable))
         }
     }
 
-    private func columnTitle(_ title: String) -> some View {
-        Text(title)
-            .font(.dot(9))
-            .foregroundStyle(Theme.dim)
-    }
-
-    private func textRow(_ label: String, _ value: String) -> some View {
-        HStack(spacing: 4) {
-            compactLabel(label)
-            Text(value)
-                .font(.dot(9))
-                .lineLimit(1)
-        }
-    }
-
-    private func compactLabel(_ text: String) -> some View {
-        Text(text)
-            .font(.dot(9))
-            .foregroundStyle(Theme.text)
-            .lineLimit(1)
-            .frame(width: 40, alignment: .leading)
-    }
-}
-
-/// Metric row: label, gap, bar with inline value. Dense in the medium
-/// columns; `large` uses the small widget's MetricRow metrics.
-private struct CompactRow: View {
-    let label: String
-    let fraction: Double?
-    var barColor: Color?
-    var valueOverride: String?
-    var large = false
-
-    var body: some View {
-        HStack(spacing: large ? 6 : 4) {
-            Text(label)
-                .font(.dot(large ? 11 : 9))
-                .foregroundStyle(Theme.text)
-                .lineLimit(1)
-                .frame(width: large ? 56 : 40, alignment: .leading)
+    /// Label, then a bar with the value inside.
+    private func barRow(
+        _ label: String, _ fraction: Double?, color: Color? = nil, value: String? = nil
+    ) -> some View {
+        HStack(spacing: sizes.gap) {
+            rowLabel(label)
             BarView(
                 fraction: fraction ?? 0,
-                color: barColor,
-                label: valueOverride ?? WidgetSnapshot.percentText(fraction),
-                height: large ? 16 : 10,
-                labelFont: .dot(large ? 10 : 8)
+                color: color,
+                label: value ?? WidgetSnapshot.percentText(fraction),
+                height: sizes.bar,
+                labelFont: .dot(sizes.value)
             )
         }
     }
+
+    private func textRow(_ label: String, _ value: String) -> some View {
+        HStack(spacing: sizes.gap) {
+            rowLabel(label)
+            Text(value).lineLimit(1)
+        }
+    }
+
+    private func rowLabel(_ text: String) -> some View {
+        Text(text)
+            .foregroundStyle(Theme.text)
+            .lineLimit(1)
+            .frame(width: sizes.labelWidth, alignment: .leading)
+    }
+}
+
+/// Text and bar sizes per widget family, in points. Doto glyphs are 0.6 em
+/// wide: "12.3/16.0 GB" plus its label must fit a 150 pt column.
+private struct Sizes {
+    var label: CGFloat      // row labels, text rows, section titles, processes
+    var labelWidth: CGFloat
+    var gap: CGFloat        // between a label and its bar or value
+    var bar: CGFloat        // bar height
+    var value: CGFloat      // value inside a bar
+    var header: CGFloat     // "Health ● 100"
+    var subheader: CGFloat  // "up 1d 7h · as of 16:47"
+    var spacing: CGFloat    // between the widget's blocks
+    var trend: CGFloat      // sparkline height
+
+    // The small widget has no subheader or trend row.
+    static let small = Sizes(label: 13, labelWidth: 50, gap: 6, bar: 22, value: 12,
+                             header: 15, subheader: 0, spacing: 12, trend: 0)
+    static let medium = Sizes(label: 10, labelWidth: 40, gap: 4, bar: 12, value: 9,
+                              header: 13, subheader: 10, spacing: 5, trend: 12)
+    static let large = Sizes(label: 12, labelWidth: 48, gap: 6, bar: 18, value: 11,
+                             header: 16, subheader: 11, spacing: 8, trend: 14)
 }
 
 private extension Font {

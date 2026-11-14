@@ -14,19 +14,19 @@ public struct WidgetSnapshot {
     public let uptime: TimeInterval?
     public let temperature: Double?
     public let topCores: [CoreUsage]
-    public let loadAverage: [Double]
     public let cpuHistory: [Double]
     public let memFreeFraction: Double?
     public let memCached: UInt64?
     public let memAvailable: UInt64?
+    public let topProcesses: [ProcessUsage]
 
     public init(
         date: Date, healthScore: Int, cpuFraction: Double?, memFraction: Double?,
         memUsed: UInt64?, memTotal: UInt64?, diskFraction: Double?, uptime: TimeInterval?,
         temperature: Double? = nil, topCores: [CoreUsage] = [],
-        loadAverage: [Double] = [], cpuHistory: [Double] = [],
+        cpuHistory: [Double] = [],
         memFreeFraction: Double? = nil, memCached: UInt64? = nil,
-        memAvailable: UInt64? = nil
+        memAvailable: UInt64? = nil, topProcesses: [ProcessUsage] = []
     ) {
         self.date = date
         self.healthScore = healthScore
@@ -38,11 +38,11 @@ public struct WidgetSnapshot {
         self.uptime = uptime
         self.temperature = temperature
         self.topCores = topCores
-        self.loadAverage = loadAverage
         self.cpuHistory = cpuHistory
         self.memFreeFraction = memFreeFraction
         self.memCached = memCached
         self.memAvailable = memAvailable
+        self.topProcesses = topProcesses
     }
 
     /// "71.6%" for a fraction, "—" for missing data.
@@ -60,17 +60,10 @@ public struct WidgetSnapshot {
         "as of \(date.formatted(date: .omitted, time: .shortened))"
     }
 
-    /// "3.85 / 3.51 / 3.63" or "—" when fewer than three values.
-    public var loadText: String {
-        guard loadAverage.count >= 3 else { return "—" }
-        return String(format: "%.2f / %.2f / %.2f",
-                      loadAverage[0], loadAverage[1], loadAverage[2])
-    }
-
-    /// "11.9 GB / 16.0 GB" or "—" when either side is missing.
+    /// "11.9/16.0 GB" (compact to fit a widget column) or "—" when either side is missing.
     public var memTotalText: String {
         guard let memUsed, let memTotal else { return "—" }
-        return "\(Fmt.gigabytes(memUsed)) / \(Fmt.gigabytes(memTotal))"
+        return "\(Fmt.gigabytesNumber(memUsed))/\(Fmt.gigabytes(memTotal))"
     }
 
     /// Formatted byte count ("2.3 GB") or "—".

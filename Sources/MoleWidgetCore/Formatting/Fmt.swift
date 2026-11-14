@@ -41,7 +41,7 @@ public enum Fmt {
         "R \(rateNumber(read)) · W \(rateNumber(write)) MB/s"
     }
 
-    private static func gigabytesNumber(_ bytes: UInt64) -> String {
+    static func gigabytesNumber(_ bytes: UInt64) -> String {
         String(format: "%.1f", Double(bytes) / 1_073_741_824.0)
     }
 
