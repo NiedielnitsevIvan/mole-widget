@@ -22,7 +22,7 @@ Fork of [TadelUnso/mole-widget](https://github.com/TadelUnso/mole-widget) with a
 
 Besides the desktop panel, the app ships a **Mole System Status** WidgetKit widget for the standard macOS widget gallery — add it to the desktop or Notification Center via right-click on the desktop → **Edit Widgets** → **Mole Widget**.
 
-<img src="assets/widget-small.png" width="188" alt="Small widget"> <img src="assets/widget-medium.png" width="358" alt="Medium widget">
+<img src="assets/widget-large.png" width="376" alt="Large widget on frosted glass over the wallpaper">
 
 - **Small** — health score plus CPU, memory and disk bars
 - **Medium** — CPU total, temperature, three busiest cores and a usage-trend sparkline next to memory detail
