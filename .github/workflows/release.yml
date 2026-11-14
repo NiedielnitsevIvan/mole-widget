@@ -32,38 +32,14 @@ jobs:
       - name: Clear stale SwiftPM cache
         run: rm -rf ~/Library/Caches/org.swift.swiftpm
 
-      - name: Build release binary
-        run: |
-          make spi
-          swift build -c release --disable-sandbox
-
-      - name: Assemble and sign app bundle
+      # Same bundle as `make install` (app, Sparkle, widget extension with its
+      # font and versions), signed with Developer ID and the hardened runtime.
+      - name: Build, assemble and sign app bundle
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          APP="dist/Mole Widget.app"
-          mkdir -p "$APP/Contents/MacOS"
-          cp .build/release/MoleWidget "$APP/Contents/MacOS/MoleWidget"
-          cp Resources/Info.plist "$APP/Contents/Info.plist"
-          mkdir -p "$APP/Contents/Resources"
-          cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
-          mkdir -p "$APP/Contents/Frameworks"
-          cp -R .build/release/Sparkle.framework "$APP/Contents/Frameworks/Sparkle.framework"
-          install_name_tool -add_rpath "@executable_path/../Frameworks" "$APP/Contents/MacOS/MoleWidget"
-
-          SIGN="Developer ID Application: Serhii Bezbabnykh ($APPLE_TEAM_ID)"
-          SPARKLE="$APP/Contents/Frameworks/Sparkle.framework/Versions/B"
-
-          # Sign Sparkle components inside-out, then the framework, then the app.
-          codesign --force --options runtime --preserve-metadata=entitlements,identifier \
-            --sign "$SIGN" "$SPARKLE/XPCServices/Downloader.xpc"
-          codesign --force --options runtime --preserve-metadata=entitlements,identifier \
-            --sign "$SIGN" "$SPARKLE/XPCServices/Installer.xpc"
-          codesign --force --options runtime --sign "$SIGN" "$SPARKLE/Autoupdate"
-          codesign --force --options runtime --sign "$SIGN" "$SPARKLE/Updater.app"
-          codesign --force --options runtime --sign "$SIGN" \
-            "$APP/Contents/Frameworks/Sparkle.framework"
-          codesign --force --options runtime --sign "$SIGN" "$APP"
+          make app BUILDFLAGS=--disable-sandbox \
+            SIGN="Developer ID Application: Serhii Bezbabnykh ($APPLE_TEAM_ID)"
 
       - name: Create DMG
         run: |
@@ -114,6 +90,7 @@ jobs:
           PUB_DATE=$(date -u "+%a, %d %b %Y %H:%M:%S +0000")
           DMG_URL="https://github.com/TadelUnso/mole-widget/releases/download/${TAG}/MoleWidget.dmg"
           BUNDLE_VER=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" Resources/Info.plist)
+          MIN_OS=$(/usr/libexec/PlistBuddy -c "Print :LSMinimumSystemVersion" Resources/Info.plist)
 
           cat > appcast.xml <<EOF
           <?xml version="1.0" encoding="utf-8"?>
@@ -128,7 +105,7 @@ jobs:
                       <pubDate>${PUB_DATE}</pubDate>
                       <sparkle:version>${BUNDLE_VER}</sparkle:version>
                       <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
-                      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+                      <sparkle:minimumSystemVersion>${MIN_OS}</sparkle:minimumSystemVersion>
                       <enclosure
                           url="${DMG_URL}"
                           length="${DMG_LENGTH}"

@@ -22,8 +22,6 @@
 	<array>
 		<string>MacOSX</string>
 	</array>
-	<key>LSMinimumSystemVersion</key>
-	<string>15.0</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>
