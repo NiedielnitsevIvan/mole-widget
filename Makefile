@@ -17,17 +17,31 @@ TESTFLAGS = -Xswiftc -F -Xswiftc $(FRAMEWORKS) \
 APP_NAME = Mole Widget
 DIST = dist/$(APP_NAME).app
 
-.PHONY: run test app install clean
+# WidgetKit exports preferredBackgroundStyle(_:), the glass background of
+# Apple's own widgets, without declaring it in the SDK interface. The widget
+# extension imports a copy of the SDK interface with the declaration appended
+# (Package.swift adds this directory to its module search path).
+SPI = .build/spi/WidgetKit.swiftmodule
+SDK_WIDGETKIT = $(SDKROOT)/System/Library/Frameworks/WidgetKit.framework/Modules/WidgetKit.swiftmodule
+
+.PHONY: run test app install clean spi
 
 run:
 	swift run MoleWidget
 
+spi: $(SPI)
+
+$(SPI): Resources/WidgetKit-SPI.swiftinterface $(SDK_WIDGETKIT)/arm64e-apple-macos.swiftinterface
+	rm -rf "$@" && mkdir -p "$(dir $@)"
+	cp -R "$(SDK_WIDGETKIT)" "$@"
+	for f in "$@"/*.swiftinterface; do cat $< >> "$$f"; done
+
 # make test            — run all tests
 # make test FILTER=Fmt — run only suites/tests matching FILTER
-test:
+test: spi
 	swift test $(TESTFLAGS) $(if $(FILTER),--filter $(FILTER))
 
-app:
+app: spi
 	swift build -c release
 	rm -rf "$(DIST)"
 	mkdir -p "$(DIST)/Contents/MacOS"
@@ -41,6 +55,14 @@ app:
 	mkdir -p "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/MacOS"
 	cp .build/release/MoleWidgetExtension "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/MacOS/MoleWidgetExtension"
 	cp Resources/WidgetExtension-Info.plist "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/Info.plist"
+	# chronod caches the widget configuration (families, background style) per
+	# extension version, so the extension takes the app's versions.
+	for key in CFBundleVersion CFBundleShortVersionString; do \
+		/usr/libexec/PlistBuddy -c "Add :$$key string $$(/usr/libexec/PlistBuddy -c "Print :$$key" Resources/Info.plist)" \
+			"$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/Info.plist"; \
+	done
+	mkdir -p "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/Resources"
+	cp -R Resources/Fonts "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex/Contents/Resources/Fonts"
 	codesign --force --sign - --entitlements Resources/WidgetExtension.entitlements "$(DIST)/Contents/PlugIns/MoleWidgetExtension.appex"
 	codesign --force --sign - "$(DIST)/Contents/Frameworks/Sparkle.framework"
 	codesign --force --sign - "$(DIST)"
@@ -49,11 +71,13 @@ app:
 # Widget gallery registration is most reliable from /Applications.
 # Sync the bundle in place: deleting it makes LaunchServices report the widget
 # extension as removed, and Notification Center then drops placed widgets.
-# pluginkit -a makes chronod pick up the new appex right away.
+# pluginkit -a makes chronod pick up the new appex right away, but a running
+# extension process keeps the old code until it exits, so stop it too.
 install: app
 	pkill -x MoleWidget || true
 	rsync -a --delete "$(DIST)/" "/Applications/$(APP_NAME).app/"
 	pluginkit -a "/Applications/$(APP_NAME).app/Contents/PlugIns/MoleWidgetExtension.appex"
+	pkill -x MoleWidgetExtension || true
 	open "/Applications/$(APP_NAME).app"
 
 clean:

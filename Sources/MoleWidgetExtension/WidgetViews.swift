@@ -21,29 +21,14 @@ struct SystemStatusView: View {
         }
     }
 
-    // MARK: - Small (unchanged from before: MetricRow-based)
+    // MARK: - Small
 
     private var small: some View {
         VStack(alignment: .leading, spacing: 8) {
             healthLine
-            MetricRow(
-                label: "CPU",
-                fraction: snapshot.cpuFraction ?? 0,
-                value: WidgetSnapshot.percentText(snapshot.cpuFraction)
-            )
-            .font(.system(size: 11).weight(.medium).monospacedDigit())
-            MetricRow(
-                label: "Memory",
-                fraction: snapshot.memFraction ?? 0,
-                value: WidgetSnapshot.percentText(snapshot.memFraction)
-            )
-            .font(.system(size: 11).weight(.medium).monospacedDigit())
-            MetricRow(
-                label: "Disk",
-                fraction: snapshot.diskFraction ?? 0,
-                value: WidgetSnapshot.percentText(snapshot.diskFraction)
-            )
-            .font(.system(size: 11).weight(.medium).monospacedDigit())
+            CompactRow(label: "CPU", fraction: snapshot.cpuFraction, large: true)
+            CompactRow(label: "Memory", fraction: snapshot.memFraction, large: true)
+            CompactRow(label: "Disk", fraction: snapshot.diskFraction, large: true)
             Spacer(minLength: 0)
         }
     }
@@ -63,25 +48,25 @@ struct SystemStatusView: View {
 
     private var healthLine: some View {
         HStack(spacing: 4) {
-            Text("Health").fontWeight(.bold)
+            Text("Health")
             Circle().fill(healthColor).frame(width: 7, height: 7)
             Text("\(snapshot.healthScore)")
             Spacer()
         }
-        .font(.system(size: 12).weight(.medium))
+        .font(.dot(12))
     }
 
     private var header: some View {
         HStack(spacing: 4) {
-            Text("Health").fontWeight(.bold)
+            Text("Health")
             Circle().fill(healthColor).frame(width: 7, height: 7)
             Text("\(snapshot.healthScore)")
             Spacer()
             Text("\(snapshot.uptimeText) · \(snapshot.asOfText)")
-                .font(.system(size: 9))
+                .font(.dot(9))
                 .foregroundStyle(Theme.dim)
         }
-        .font(.system(size: 12).weight(.medium))
+        .font(.dot(12))
     }
 
     private var cpuColumn: some View {
@@ -120,7 +105,7 @@ struct SystemStatusView: View {
 
     private func columnTitle(_ title: String) -> some View {
         Text(title)
-            .font(.system(size: 9, weight: .bold))
+            .font(.dot(9))
             .foregroundStyle(Theme.dim)
     }
 
@@ -128,42 +113,51 @@ struct SystemStatusView: View {
         HStack(spacing: 4) {
             compactLabel(label)
             Text(value)
-                .font(.system(size: 9).weight(.medium))
-                .monospacedDigit()
+                .font(.dot(9))
                 .lineLimit(1)
         }
     }
 
     private func compactLabel(_ text: String) -> some View {
         Text(text)
-            .font(.system(size: 9).weight(.medium))
+            .font(.dot(9))
             .foregroundStyle(Theme.text)
             .lineLimit(1)
             .frame(width: 40, alignment: .leading)
     }
 }
 
-/// Dense metric row: 40 pt label, 4 pt gap, thin bar with inline value.
+/// Metric row: label, gap, bar with inline value. Dense in the medium
+/// columns; `large` uses the small widget's MetricRow metrics.
 private struct CompactRow: View {
     let label: String
     let fraction: Double?
     var barColor: Color?
     var valueOverride: String?
-    var height: CGFloat = 10
+    var large = false
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: large ? 6 : 4) {
             Text(label)
-                .font(.system(size: 9).weight(.medium))
+                .font(.dot(large ? 11 : 9))
                 .foregroundStyle(Theme.text)
                 .lineLimit(1)
-                .frame(width: 40, alignment: .leading)
+                .frame(width: large ? 56 : 40, alignment: .leading)
             BarView(
                 fraction: fraction ?? 0,
                 color: barColor,
                 label: valueOverride ?? WidgetSnapshot.percentText(fraction),
-                height: height
+                height: large ? 16 : 10,
+                labelFont: .dot(large ? 10 : 8)
             )
         }
+    }
+}
+
+private extension Font {
+    /// Dot-matrix font bundled in the appex (Resources/Fonts, registered
+    /// through ATSApplicationFontsPath); falls back to the system font.
+    static func dot(_ size: CGFloat) -> Font {
+        .custom("DotoRounded-Regular", size: size)
     }
 }

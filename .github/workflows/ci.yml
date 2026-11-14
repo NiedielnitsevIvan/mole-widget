@@ -18,7 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build
-        run: swift build
+        run: |
+          make spi
+          swift build
       - name: Test
         run: make test
       - name: Assemble app bundle

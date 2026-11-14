@@ -50,7 +50,7 @@ Besides the desktop panel, the app ships a **Mole System Status** WidgetKit widg
 
 ## Requirements
 
-- macOS 14+ to run (Liquid Glass and the system restyle kick in on macOS 26+)
+- macOS 15+ to run (Liquid Glass and the system restyle kick in on macOS 26+)
 - To build: Swift 6 toolchain with the macOS 26 SDK — Command Line Tools are enough (`xcode-select --install`), full Xcode is not required. The Makefile pins the 26.5 SDK to work around a CLT 27 beta issue
 
 ## Install

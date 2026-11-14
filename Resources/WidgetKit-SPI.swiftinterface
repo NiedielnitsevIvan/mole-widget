@@ -1,0 +1,17 @@
+
+// Appended to the SDK's WidgetKit interface by `make spi`. WidgetKit exports
+// these symbols (Apple's Batteries widget uses them for its glass background)
+// but the SDK interface does not declare them.
+public enum WidgetBackgroundStyle : Swift.Int {
+  case opaque
+  case blur
+  case transparent
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+extension SwiftUI.WidgetConfiguration {
+  public func preferredBackgroundStyle(_ style: WidgetKit.WidgetBackgroundStyle) -> some SwiftUI.WidgetConfiguration
+}

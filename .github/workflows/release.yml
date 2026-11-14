@@ -33,7 +33,9 @@ jobs:
         run: rm -rf ~/Library/Caches/org.swift.swiftpm
 
       - name: Build release binary
-        run: swift build -c release --disable-sandbox
+        run: |
+          make spi
+          swift build -c release --disable-sandbox
 
       - name: Assemble and sign app bundle
         env:
@@ -126,7 +128,7 @@ jobs:
                       <pubDate>${PUB_DATE}</pubDate>
                       <sparkle:version>${BUNDLE_VER}</sparkle:version>
                       <sparkle:shortVersionString>${VERSION}</sparkle:shortVersionString>
-                      <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+                      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
                       <enclosure
                           url="${DMG_URL}"
                           length="${DMG_LENGTH}"
