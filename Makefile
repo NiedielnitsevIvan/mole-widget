@@ -47,10 +47,13 @@ app:
 	@echo "Done: $(DIST)"
 
 # Widget gallery registration is most reliable from /Applications.
+# Sync the bundle in place: deleting it makes LaunchServices report the widget
+# extension as removed, and Notification Center then drops placed widgets.
+# pluginkit -a makes chronod pick up the new appex right away.
 install: app
 	pkill -x MoleWidget || true
-	rm -rf "/Applications/$(APP_NAME).app"
-	ditto "$(DIST)" "/Applications/$(APP_NAME).app"
+	rsync -a --delete "$(DIST)/" "/Applications/$(APP_NAME).app/"
+	pluginkit -a "/Applications/$(APP_NAME).app/Contents/PlugIns/MoleWidgetExtension.appex"
 	open "/Applications/$(APP_NAME).app"
 
 clean:
