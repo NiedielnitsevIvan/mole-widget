@@ -6,6 +6,9 @@ on:
 
 jobs:
   release:
+    # Signing, notarization and the Sparkle key are upstream's secrets; the
+    # fork publishes unsigned builds by hand instead.
+    if: github.repository == 'TadelUnso/mole-widget'
     runs-on: macos-15
     permissions:
       contents: write
