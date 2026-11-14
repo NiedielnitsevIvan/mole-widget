@@ -70,6 +70,16 @@ make app
 open "dist/Mole Widget.app"
 ```
 
+### Prebuilt (this fork)
+
+Download `MoleWidget.dmg` from this fork's [Releases page](https://github.com/NiedielnitsevIvan/mole-widget/releases) and drag the app to /Applications. These builds are ad-hoc signed, not notarized, so macOS blocks the first launch: open **System Settings → Privacy & Security** and click **Open Anyway**, or clear the quarantine flag:
+
+```bash
+xattr -dr com.apple.quarantine "/Applications/Mole Widget.app"
+```
+
+Sparkle can't install unsigned updates, so check the Releases page for new versions.
+
 ### Prebuilt (upstream)
 
 The signed, notarized DMG on the upstream [Releases page](https://github.com/TadelUnso/mole-widget/releases) and the `TadelUnso/tap/mole-widget` Homebrew cask install the **original** app — they do not include this fork's additions.
