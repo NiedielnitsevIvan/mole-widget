@@ -15,7 +15,7 @@ Fork of [TadelUnso/mole-widget](https://github.com/TadelUnso/mole-widget) with a
 - **Liquid Glass** — on macOS 26+ the panel is a Liquid Glass surface, with the background-opacity setting acting as the glass tint
 - **Narrow layout** — the window resizes down to 330 pt (upstream: 490) and folds to a single column below 460 pt
 - **Inline bar labels** — values are drawn inside the capacity bars for tighter rows
-- **Widget-gallery widget** — a "Mole System Status" WidgetKit widget for the macOS widget gallery, [see below](#macos-widget)
+- **Widget-gallery widget** — a "Mole System Status" WidgetKit widget in three sizes, on frosted system glass with a dot-matrix font, [see below](#macos-widget)
 - `make install` — build and install straight into /Applications
 
 ## macOS widget
@@ -27,7 +27,8 @@ Besides the desktop panel, the app ships a **Mole System Status** WidgetKit widg
 - **Small** — health score plus CPU, memory and disk bars
 - **Medium** — CPU total, temperature, three busiest cores and a usage-trend sparkline next to memory detail
 - **Large** — the medium layout with bigger text and bars, plus the five busiest processes (the widget's sandbox can't list processes, so they come from the running app)
-- While the app is running, the widget refreshes every 5 s (the fastest macOS allows). Without the app, WidgetKit's budget only refreshes it occasionally — mostly on system wakes — so keep the app running for live values
+- **Look** — the frosted system glass of Apple's own Batteries widget and the [Doto](https://github.com/oliverlalan/Doto) dot-matrix font (SIL Open Font License, `Resources/Fonts/OFL.txt`). The glass comes from a WidgetKit API Apple ships but doesn't declare publicly (`make spi` declares it at build time), so a future macOS may change it
+- While the app is running, the widget refreshes every 5 s (the fastest macOS allows), also with the desktop panel hidden. Once the app quits, WidgetKit's budget only refreshes the widget occasionally, mostly on system wakes. For live values hide the panel (eye icon or **Show on desktop**) instead of quitting, and turn on **Launch at login**
 
 ## Features
 
@@ -106,6 +107,9 @@ make test   # run the test suite (128 tests)
 > **Important:** run tests only via `make test`. On a machine without full Xcode
 > a bare `swift test` silently runs zero tests and exits 0 — the Makefile passes
 > the toolchain flags required for Swift Testing from Command Line Tools.
+>
+> Build through the Makefile too: the widget extension needs the WidgetKit
+> interface `make spi` generates, so a bare `swift build` fails until it has run.
 
 ## Architecture
 
